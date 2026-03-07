@@ -1,0 +1,1 @@
+# VITMMB10-halado-adatelemzesi-labor
