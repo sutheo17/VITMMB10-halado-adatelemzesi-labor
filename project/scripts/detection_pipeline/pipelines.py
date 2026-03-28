@@ -3,7 +3,6 @@ from __future__ import annotations
 import albumentations as A
 import cv2
 
-# Increase the upper end of DETECTION_NOISE_STD_RANGE for stronger noise.
 DETECTION_NOISE_STD_RANGE = (0.01, 0.04)
 
 
@@ -23,9 +22,5 @@ def build_detection_train_pipeline() -> A.Compose:
             A.RandomBrightnessContrast(brightness_limit=0.08, contrast_limit=0.08, p=0.20),
             A.GaussNoise(std_range=DETECTION_NOISE_STD_RANGE, mean_range=(0.0, 0.0), p=0.15),
         ],
-        bbox_params=A.BboxParams(
-            format="pascal_voc",
-            label_fields=["class_labels"],
-            min_visibility=0.20,
-        ),
+        bbox_params=A.BboxParams(format="pascal_voc", label_fields=["class_labels"], min_visibility=0.20),
     )

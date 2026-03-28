@@ -6,28 +6,17 @@ from torch.utils.data import Dataset
 
 import albumentations as A
 
-from ..preprocessing import load_radiograph, to_chw_tensor
+from .preprocessing import load_radiograph, to_chw_tensor
 
 
 class ToothDetectionDataset(Dataset):
-    def __init__(
-        self,
-        records: list[dict],
-        *,
-        image_size: int = 640,
-        output_channels: int = 3,
-        denoise: bool = True,
-    ) -> None:
+    def __init__(self, records: list[dict], *, image_size: int = 640, output_channels: int = 3, denoise: bool = True) -> None:
         self.records = records
         self.output_channels = output_channels
         self.denoise = denoise
         self.resize = A.Compose(
             [A.Resize(image_size, image_size)],
-            bbox_params=A.BboxParams(
-                format="pascal_voc",
-                label_fields=["class_labels"],
-                min_visibility=0.0,
-            ),
+            bbox_params=A.BboxParams(format="pascal_voc", label_fields=["class_labels"], min_visibility=0.0),
         )
 
     def __len__(self) -> int:
@@ -35,11 +24,7 @@ class ToothDetectionDataset(Dataset):
 
     def get_raw_sample(self, index: int) -> dict:
         record = self.records[index]
-        image = load_radiograph(
-            record["image_path"],
-            denoise=self.denoise,
-            output_channels=self.output_channels,
-        )
+        image = load_radiograph(record["image_path"], denoise=self.denoise, output_channels=self.output_channels)
         transformed = self.resize(image=image, bboxes=record["boxes"], class_labels=record["labels"])
         return {
             "image_np": transformed["image"].astype(np.float32),
@@ -51,11 +36,7 @@ class ToothDetectionDataset(Dataset):
     def __getitem__(self, index: int):
         sample = self.get_raw_sample(index)
         boxes = sample["boxes"]
-        area = (
-            (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-            if len(boxes)
-            else np.zeros((0,), dtype=np.float32)
-        )
+        area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1]) if len(boxes) else np.zeros((0,), dtype=np.float32)
         target = {
             "boxes": torch.from_numpy(boxes),
             "labels": torch.from_numpy(sample["labels"]),
@@ -76,18 +57,10 @@ class AugmentedToothDetectionDataset(Dataset):
 
     def __getitem__(self, index: int):
         sample = self.base_dataset.get_raw_sample(index)
-        transformed = self.transform(
-            image=sample["image_np"],
-            bboxes=sample["boxes"].tolist(),
-            class_labels=sample["labels"].tolist(),
-        )
+        transformed = self.transform(image=sample["image_np"], bboxes=sample["boxes"].tolist(), class_labels=sample["labels"].tolist())
         boxes = np.asarray(transformed["bboxes"], dtype=np.float32).reshape(-1, 4)
         labels = np.asarray(transformed["class_labels"], dtype=np.int64)
-        area = (
-            (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-            if len(boxes)
-            else np.zeros((0,), dtype=np.float32)
-        )
+        area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1]) if len(boxes) else np.zeros((0,), dtype=np.float32)
         target = {
             "boxes": torch.from_numpy(boxes),
             "labels": torch.from_numpy(labels),
