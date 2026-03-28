@@ -1,4 +1,6 @@
-data/
+project/.env
+project/data/
+project/denim-1/
 
 
 # Byte-compiled / optimized / DLL files
