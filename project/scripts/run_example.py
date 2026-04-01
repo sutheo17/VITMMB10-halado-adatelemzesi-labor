@@ -100,9 +100,9 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     if not indices:
         print(f"No samples available for {name}.")
         return
-
+    
     clean_name = name.replace(' ', '_').replace('(', '').replace(')', '')
-
+    txt_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}_file_list.txt")
     img_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}.jpg")
 
     cols = 5
@@ -110,13 +110,22 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 4 * rows))
     axes_arr = np.atleast_1d(axes).ravel()
 
-    for ax, idx in zip(axes_arr, indices):
-        image_tensor, label_tensor = dataset[idx]
-        image = _to_display_image(image_tensor)
-        label = int(label_tensor.item())
-        ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
-        ax.set_title(f"idx={idx} label={label}", fontsize=9)
-        ax.axis("off")
+    with open(txt_filepath, "w", encoding="utf-8") as f:
+        f.write(f"--- Classification file list: {name} ---\n")
+        f.write(f"Format: [Index in Plot] - [Original Filename]\n\n")
+
+        for ax, idx in zip(axes_arr, indices):
+            image_tensor, label_tensor, metadata = dataset[idx]
+            
+            image = _to_display_image(image_tensor)
+            label = int(label_tensor.item())
+            file_name = metadata.get("file_name", "unknown")
+
+            f.write(f"{idx} - {file_name}\n")
+
+            ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
+            ax.set_title(f"idx={idx} L={label}", fontsize=10, fontweight='bold')
+            ax.axis("off")
 
     for ax in axes_arr[len(indices):]:
         ax.axis("off")
