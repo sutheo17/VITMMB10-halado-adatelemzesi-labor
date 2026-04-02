@@ -220,7 +220,7 @@ def main() -> None:
     _show_classification_examples("Classification val", classification_val, sample_count=20)
     _show_classification_examples("Classification test", classification_test, sample_count=20)
 
-    print("Close all figure windows to finish.")
+    print("Example images saved to output directory (scripts/output). See corresponding text files for original filenames.")
     plt.show()
 
 
