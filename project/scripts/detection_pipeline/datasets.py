@@ -31,6 +31,7 @@ class ToothDetectionDataset(Dataset):
             "boxes": np.asarray(transformed["bboxes"], dtype=np.float32).reshape(-1, 4),
             "labels": np.asarray(transformed["class_labels"], dtype=np.int64),
             "image_id": int(record["image_id"]),
+            "file_name": record["file_name"],
         }
 
     def __getitem__(self, index: int):
@@ -43,6 +44,7 @@ class ToothDetectionDataset(Dataset):
             "image_id": torch.tensor(sample["image_id"], dtype=torch.int64),
             "area": torch.from_numpy(area.astype(np.float32)),
             "iscrowd": torch.zeros((len(sample["labels"]),), dtype=torch.int64),
+            "file_name": sample["file_name"],
         }
         return to_chw_tensor(sample["image_np"]), target
 
@@ -67,6 +69,7 @@ class AugmentedToothDetectionDataset(Dataset):
             "image_id": torch.tensor(sample["image_id"], dtype=torch.int64),
             "area": torch.from_numpy(area.astype(np.float32)),
             "iscrowd": torch.zeros((len(labels),), dtype=torch.int64),
+            "file_name": sample["file_name"],
         }
         return to_chw_tensor(transformed["image"]), target
 

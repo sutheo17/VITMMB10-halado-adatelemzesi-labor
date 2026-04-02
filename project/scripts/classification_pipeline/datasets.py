@@ -52,6 +52,7 @@ class ToothCropDataset(Dataset):
         return {
             "image_np": crop.astype(np.float32),
             "label": int(record["label"]),
+            "file_name": record.get("file_name", "unknown"),
             "record_id": record["record_id"],
             "source_image_id": int(record["source_image_id"]),
             "source_class": record["source_class"],
@@ -59,4 +60,5 @@ class ToothCropDataset(Dataset):
 
     def __getitem__(self, index: int):
         sample = self.get_raw_sample(index)
-        return to_chw_tensor(sample["image_np"]), torch.tensor(sample["label"], dtype=torch.long)
+        metadata = {"file_name": sample["file_name"]}
+        return to_chw_tensor(sample["image_np"]), torch.tensor(sample["label"], dtype=torch.long), metadata

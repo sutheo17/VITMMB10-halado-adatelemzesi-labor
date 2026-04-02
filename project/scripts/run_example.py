@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import random
 import sys
+import config
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -52,33 +53,46 @@ def _show_detection_examples(name: str, dataset, sample_count: int = 20) -> None
         print(f"No samples available for {name}.")
         return
 
+    clean_name = name.replace(' ', '_').replace('(', '').replace(')', '')
+    txt_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}_file_list.txt")
+    img_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}.jpg")
+
     cols = 5
     rows = int(np.ceil(len(indices) / cols))
     fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 4 * rows))
     axes_arr = np.atleast_1d(axes).ravel()
 
-    for ax, idx in zip(axes_arr, indices):
-        image_tensor, target = dataset[idx]
-        image = _to_display_image(image_tensor)
-        ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
+    with open(txt_filepath, "w", encoding="utf-8") as f:
+        f.write(f"--- File list for: {name} ---\n")
+        f.write(f"Format: [Index in Plot] - [Original Filename]\n\n")
+        
+        for ax, idx in zip(axes_arr, indices):
+            image_tensor, target = dataset[idx]
+            image = _to_display_image(image_tensor)
+            ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
 
-        boxes = target["boxes"].detach().cpu().numpy()
-        labels = target["labels"].detach().cpu().numpy()
-        for box, label in zip(boxes, labels):
-            x1, y1, x2, y2 = box
-            rect = Rectangle((x1, y1), x2 - x1, y2 - y1, fill=False, linewidth=1.5, edgecolor="lime")
-            ax.add_patch(rect)
-            ax.text(x1, max(0.0, y1 - 3), str(int(label)), color="yellow", fontsize=8, backgroundcolor="black")
+            file_name = target.get("file_name", "Ismeretlen_fajl")
+            
+            f.write(f"{idx} - {file_name}\n")
 
-        ax.set_title(f"idx={idx} boxes={len(boxes)}", fontsize=9)
-        ax.axis("off")
+            boxes = target["boxes"].detach().cpu().numpy()
+            labels = target["labels"].detach().cpu().numpy()
+            for box, label in zip(boxes, labels):
+                x1, y1, x2, y2 = box
+                rect = Rectangle((x1, y1), x2 - x1, y2 - y1, fill=False, linewidth=1.5, edgecolor="lime")
+                ax.add_patch(rect)
+                ax.text(x1, max(0.0, y1 - 3), str(int(label)), color="yellow", fontsize=8, backgroundcolor="black")
+
+            ax.set_title(f"idx={idx}", fontsize=10, fontweight='bold')
+            ax.axis("off")
 
     for ax in axes_arr[len(indices):]:
         ax.axis("off")
 
     fig.suptitle(f"{name} - {len(indices)} examples", fontsize=14)
     fig.tight_layout()
-    plt.show(block=False)
+    plt.savefig(img_filepath)
+    plt.close(fig)
 
 
 def _show_classification_examples(name: str, dataset, sample_count: int = 20) -> None:
@@ -86,29 +100,54 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     if not indices:
         print(f"No samples available for {name}.")
         return
+    
+    clean_name = name.replace(' ', '_').replace('(', '').replace(')', '')
+    txt_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}_file_list.txt")
+    img_filepath = os.path.join(config.OUTPUT_DIR, f"{clean_name}.jpg")
 
     cols = 5
     rows = int(np.ceil(len(indices) / cols))
     fig, axes = plt.subplots(rows, cols, figsize=(4 * cols, 4 * rows))
     axes_arr = np.atleast_1d(axes).ravel()
 
-    for ax, idx in zip(axes_arr, indices):
-        image_tensor, label_tensor = dataset[idx]
-        image = _to_display_image(image_tensor)
-        label = int(label_tensor.item())
-        ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
-        ax.set_title(f"idx={idx} label={label}", fontsize=9)
-        ax.axis("off")
+    with open(txt_filepath, "w", encoding="utf-8") as f:
+        f.write(f"--- File list for: {name} ---\n")
+        f.write(f"Format: [Index in Plot] - [Original Filename]\n\n")
+
+        for ax, idx in zip(axes_arr, indices):
+            image_tensor, label_tensor, metadata = dataset[idx]
+            
+            image = _to_display_image(image_tensor)
+            label = int(label_tensor.item())
+            file_name = metadata.get("file_name", "unknown")
+
+            f.write(f"{idx} - {file_name}\n")
+
+            ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
+            ax.set_title(f"idx={idx} L={label}", fontsize=10, fontweight='bold')
+            ax.axis("off")
 
     for ax in axes_arr[len(indices):]:
         ax.axis("off")
 
     fig.suptitle(f"{name} - {len(indices)} examples", fontsize=14)
     fig.tight_layout()
-    plt.show(block=False)
+    plt.savefig(img_filepath)
+    plt.close(fig)
 
+def split_records_by_subset(records: list[dict[str, Any]]):
+    """
+    Based on roboflow dataset structure, splits records into train/val/test based on 'subset' field.
+    """
+    train_rec = [r for r in records if r.get("subset") == "train"]
+    val_rec   = [r for r in records if r.get("subset") in ["valid", "val"]]
+    test_rec  = [r for r in records if r.get("subset") == "test"]
+    
+    return train_rec, val_rec, test_rec
 
 def main() -> None:
+    os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+
     api_key = os.getenv("ROBOFLOW_API_KEY")
     force_download = any(arg.lower() == "download" for arg in sys.argv[1:])
 
@@ -122,7 +161,7 @@ def main() -> None:
         force_download=force_download,
     )
     detection_records, tooth_label_map = build_detection_records(detection_coco, detection_image_dirs)
-    det_train, det_val, det_test = split_detection_records(detection_records)
+    det_train, det_val, det_test = split_records_by_subset(detection_records)
 
     detection_train = AugmentedToothDetectionDataset(
         ToothDetectionDataset(det_train, image_size=640, output_channels=3),
@@ -141,7 +180,7 @@ def main() -> None:
         positive_classes=("Caries",),
         crop_margin=0.08,
     )
-    cls_train, cls_val, cls_test = split_classification_records(classification_records)
+    cls_train, cls_val, cls_test = split_records_by_subset(classification_records)
 
     resize = build_classification_resize_pipeline(224)
     classification_train = ToothCropDataset(
@@ -181,7 +220,7 @@ def main() -> None:
     _show_classification_examples("Classification val", classification_val, sample_count=20)
     _show_classification_examples("Classification test", classification_test, sample_count=20)
 
-    print("Close all figure windows to finish.")
+    print("Example images saved to output directory (scripts/output). See corresponding text files for original filenames.")
     plt.show()
 
 

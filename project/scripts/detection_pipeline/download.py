@@ -11,8 +11,8 @@ from roboflow import Roboflow
 
 @dataclass(frozen=True)
 class DetectionDownloadConfig:
-    workspace: str = "mohamed-uob"
-    project_name: str = "denim"
+    workspace: str = "sthes-workspace"
+    project_name: str = "denim-eihop"
     version: int = 1
     export_format: str = "coco"
     data_root: Path = Path("data") / "detection"
