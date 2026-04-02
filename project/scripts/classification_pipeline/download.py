@@ -11,9 +11,9 @@ from roboflow import Roboflow
 
 @dataclass(frozen=True)
 class ClassificationDownloadConfig:
-    workspace: str = "wishis64"
-    project_name: str = "se-iwfnq"
-    version: int = 1
+    workspace: str = "sthes-workspace"
+    project_name: str = "se-iwfnq-4mlpj"
+    version: int = 2
     export_format: str = "coco-segmentation"
     data_root: Path = Path("data") / "classification"
     api_key: str | None = None

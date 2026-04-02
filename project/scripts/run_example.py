@@ -111,7 +111,7 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     axes_arr = np.atleast_1d(axes).ravel()
 
     with open(txt_filepath, "w", encoding="utf-8") as f:
-        f.write(f"--- Classification file list: {name} ---\n")
+        f.write(f"--- File list for: {name} ---\n")
         f.write(f"Format: [Index in Plot] - [Original Filename]\n\n")
 
         for ax, idx in zip(axes_arr, indices):
@@ -135,6 +135,15 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     plt.savefig(img_filepath)
     plt.close(fig)
 
+def split_records_by_subset(records: list[dict[str, Any]]):
+    """
+    Based on roboflow dataset structure, splits records into train/val/test based on 'subset' field.
+    """
+    train_rec = [r for r in records if r.get("subset") == "train"]
+    val_rec   = [r for r in records if r.get("subset") in ["valid", "val"]]
+    test_rec  = [r for r in records if r.get("subset") == "test"]
+    
+    return train_rec, val_rec, test_rec
 
 def main() -> None:
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
@@ -152,7 +161,7 @@ def main() -> None:
         force_download=force_download,
     )
     detection_records, tooth_label_map = build_detection_records(detection_coco, detection_image_dirs)
-    det_train, det_val, det_test = split_detection_records(detection_records)
+    det_train, det_val, det_test = split_records_by_subset(detection_records)
 
     detection_train = AugmentedToothDetectionDataset(
         ToothDetectionDataset(det_train, image_size=640, output_channels=3),
@@ -171,7 +180,7 @@ def main() -> None:
         positive_classes=("Caries",),
         crop_margin=0.08,
     )
-    cls_train, cls_val, cls_test = split_classification_records(classification_records)
+    cls_train, cls_val, cls_test = split_records_by_subset(classification_records)
 
     resize = build_classification_resize_pipeline(224)
     classification_train = ToothCropDataset(
