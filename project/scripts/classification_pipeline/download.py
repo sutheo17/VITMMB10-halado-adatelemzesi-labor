@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import config
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +16,7 @@ class ClassificationDownloadConfig:
     project_name: str = "se-iwfnq-4mlpj"
     version: int = 2
     export_format: str = "coco-segmentation"
-    data_root: Path = Path("data") / "classification"
+    data_root: Path = config.DATA_DIR / "classification_dataset"
     api_key: str | None = None
 
     def resolved_api_key(self) -> str:

@@ -3,7 +3,12 @@ from __future__ import annotations
 import os
 import random
 import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import config
+from utils.data_split import split_records_by_subset
+from utils.display_item import to_display_image
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,16 +34,6 @@ from detection_pipeline import (
     load_or_download_detection_dataset,
     split_grouped_records as split_detection_records,
 )
-
-
-def _to_display_image(image_tensor: torch.Tensor) -> np.ndarray:
-    image_np = image_tensor.detach().cpu().numpy()
-    image_np = np.transpose(image_np, (1, 2, 0))
-    if image_np.shape[-1] == 1:
-        image_np = image_np[..., 0]
-    image_np = np.clip(image_np, 0.0, 1.0)
-    return image_np
-
 
 def _sample_indices(dataset_len: int, sample_count: int) -> list[int]:
     count = min(sample_count, dataset_len)
@@ -68,7 +63,7 @@ def _show_detection_examples(name: str, dataset, sample_count: int = 20) -> None
         
         for ax, idx in zip(axes_arr, indices):
             image_tensor, target = dataset[idx]
-            image = _to_display_image(image_tensor)
+            image = to_display_image(image_tensor)
             ax.imshow(image, cmap="gray" if image.ndim == 2 else None)
 
             file_name = target.get("file_name", "Ismeretlen_fajl")
@@ -117,7 +112,7 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
         for ax, idx in zip(axes_arr, indices):
             image_tensor, label_tensor, metadata = dataset[idx]
             
-            image = _to_display_image(image_tensor)
+            image = to_display_image(image_tensor)
             label = int(label_tensor.item())
             file_name = metadata.get("file_name", "unknown")
 
@@ -135,18 +130,10 @@ def _show_classification_examples(name: str, dataset, sample_count: int = 20) ->
     plt.savefig(img_filepath)
     plt.close(fig)
 
-def split_records_by_subset(records: list[dict[str, Any]]):
-    """
-    Based on roboflow dataset structure, splits records into train/val/test based on 'subset' field.
-    """
-    train_rec = [r for r in records if r.get("subset") == "train"]
-    val_rec   = [r for r in records if r.get("subset") in ["valid", "val"]]
-    test_rec  = [r for r in records if r.get("subset") == "test"]
-    
-    return train_rec, val_rec, test_rec
 
 def main() -> None:
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+
 
     api_key = os.getenv("ROBOFLOW_API_KEY")
     force_download = any(arg.lower() == "download" for arg in sys.argv[1:])
@@ -220,7 +207,7 @@ def main() -> None:
     _show_classification_examples("Classification val", classification_val, sample_count=20)
     _show_classification_examples("Classification test", classification_test, sample_count=20)
 
-    print("Example images saved to output directory (scripts/output). See corresponding text files for original filenames.")
+    print("Example images saved to output directory. See corresponding text files for original filenames.")
     plt.show()
 
 
