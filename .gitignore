@@ -216,3 +216,6 @@ __marimo__/
 *.jpg
 project/scripts/data
 project/scripts/output
+project/output
+project/scripts/wandb
+project/notebooks/wandb

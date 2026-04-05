@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import json
 import os
+import config
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
 
 from roboflow import Roboflow
 
@@ -15,7 +17,7 @@ class DetectionDownloadConfig:
     project_name: str = "denim-eihop"
     version: int = 1
     export_format: str = "coco"
-    data_root: Path = Path("data") / "detection"
+    data_root: Path = config.DATA_DIR / "detection_dataset"
     api_key: str | None = None
 
     def resolved_api_key(self) -> str:
