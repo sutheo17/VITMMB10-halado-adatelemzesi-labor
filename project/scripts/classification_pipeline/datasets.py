@@ -34,9 +34,10 @@ class ToothCropDataset(Dataset):
         record = self.records[index]
         image = load_radiograph(record["image_path"], denoise=self.denoise, output_channels=1)
         crop_box = record["crop_box"]
+        class_label = int(record["label"])
 
         if self.image_transform is not None:
-            transformed = self.image_transform(image=image, bboxes=[crop_box], class_labels=[1])
+            transformed = self.image_transform(image=image, bboxes=[crop_box], class_labels=[class_label])
             image = transformed["image"]
             crop_box = transformed["bboxes"][0]
 
@@ -51,7 +52,8 @@ class ToothCropDataset(Dataset):
 
         return {
             "image_np": crop.astype(np.float32),
-            "label": int(record["label"]),
+            "label": class_label,
+            "label_name": str(record.get("label_name", record.get("source_class", "unknown"))),
             "file_name": record.get("file_name", "unknown"),
             "record_id": record["record_id"],
             "source_image_id": int(record["source_image_id"]),
@@ -60,5 +62,9 @@ class ToothCropDataset(Dataset):
 
     def __getitem__(self, index: int):
         sample = self.get_raw_sample(index)
-        metadata = {"file_name": sample["file_name"]}
+        metadata = {
+            "file_name": sample["file_name"],
+            "label_name": sample["label_name"],
+            "source_class": sample["source_class"],
+        }
         return to_chw_tensor(sample["image_np"]), torch.tensor(sample["label"], dtype=torch.long), metadata

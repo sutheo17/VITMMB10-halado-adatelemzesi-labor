@@ -9,7 +9,7 @@
 ## Classification pipeline
 
 - `classification_pipeline/download.py`: downloads the Roboflow `wishis64/se-iwfnq` dataset in COCO segmentation format and merges all split JSON files.
-- `classification_pipeline/records.py`: builds positive carious-tooth crop records from the `Caries` segmentation masks by converting each tooth outline into a bounding box and then expanding that box slightly.
+- `classification_pipeline/records.py`: builds tooth crop records from segmentation masks for all selected classes by converting each tooth outline into a bounding box and then expanding that box slightly. Supports `max_samples_per_label` to cap examples per class.
 - `classification_pipeline/preprocessing.py`: grayscale loading, robust normalization, mild denoising.
 - `classification_pipeline/pipelines.py`: bbox-aware classification augmentations applied on the full radiograph before cropping.
 - `classification_pipeline/datasets.py`: crop dataset for classification.
@@ -24,4 +24,21 @@
 
 ## Note on labels
 
-The segmentation-based classification builder intentionally labels only `Caries` masks as positive tooth crops. It does **not** automatically invent negatives from unrelated classes like implants, fillings, or crowns, because that would contaminate a medical binary classifier. If you want a binary caries-vs-non-caries classifier, add a medically valid negative-tooth source separately.
+The classification builder now supports multi-class tooth classification by using available segmentation labels from the dataset (including `Caries` and other classes). You can limit class imbalance with a per-label cap.
+
+## Running with `dl-preprocess`
+
+Use the `dl-preprocess` conda environment when running scripts.
+
+- Default:
+	- `conda run -n dl-preprocess python scripts/run_example.py`
+- Force dataset re-download:
+	- `conda run -n dl-preprocess python scripts/run_example.py download`
+- Uniform cap per class (e.g. 300):
+	- `conda run -n dl-preprocess python scripts/run_example.py max_per_label=300`
+- Per-class caps:
+	- `conda run -n dl-preprocess python scripts/run_example.py max_per_label=Caries:1000,Filling:500,Implant:500`
+
+The run script also saves a dedicated non-caries visualization panel:
+
+- `output/Classification_train_non-caries.jpg`
