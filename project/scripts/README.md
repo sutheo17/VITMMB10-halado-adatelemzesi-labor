@@ -1,18 +1,20 @@
 ## Detection pipeline
 
-- `detecton_pipeline/download.py`: downloads the Roboflow `mohamed-uob/denim` dataset and merges all COCO split JSON files instead of loading only the first one.
-- `detection_pipeline/records.py`: parses merged COCO annotations into tooth detection records.
-- `detection_pipeline/preprocessing.py`: grayscale loading, robust normalization, mild denoising.
-- `detection_pipeline/pipelines.py`: train-time detection augmentations.
-- `detection_pipeline/datasets.py`: detection datasets and collate function.
+- `detection_pipeline/data_preparation/download.py`: downloads the Roboflow `mohamed-uob/denim` dataset and merges all COCO split JSON files instead of loading only the first one.
+- `detection_pipeline/data_preparation/records.py`: parses merged COCO annotations into tooth detection records.
+- `detection_pipeline/data_preparation/preprocessing.py`: grayscale loading, robust normalization, mild denoising.
+- `detection_pipeline/data_preparation/pipelines.py`: train-time detection augmentations.
+- `detection_pipeline/data_preparation/datasets.py`: detection datasets and collate function.
+- `detection_pipeline/training/`: reserved for training-specific pipeline code.
 
 ## Classification pipeline
 
-- `classification_pipeline/download.py`: downloads the Roboflow `wishis64/se-iwfnq` dataset in COCO segmentation format and merges all split JSON files.
-- `classification_pipeline/records.py`: builds tooth crop records from segmentation masks for all selected classes by converting each tooth outline into a bounding box and then expanding that box slightly. Supports `max_samples_per_label` to cap examples per class.
-- `classification_pipeline/preprocessing.py`: grayscale loading, robust normalization, mild denoising.
-- `classification_pipeline/pipelines.py`: bbox-aware classification augmentations applied on the full radiograph before cropping.
-- `classification_pipeline/datasets.py`: crop dataset for classification.
+- `classification_pipeline/data_preparation/download.py`: downloads the Roboflow `wishis64/se-iwfnq` dataset in COCO segmentation format and merges all split JSON files.
+- `classification_pipeline/data_preparation/records.py`: builds tooth crop records from segmentation masks for all selected classes by converting each tooth outline into a bounding box and then expanding that box slightly. Supports `max_samples_per_label` to cap examples per class.
+- `classification_pipeline/data_preparation/preprocessing.py`: grayscale loading, robust normalization, mild denoising.
+- `classification_pipeline/data_preparation/pipelines.py`: bbox-aware classification augmentations applied on the full radiograph before cropping.
+- `classification_pipeline/data_preparation/datasets.py`: crop dataset for classification.
+- `classification_pipeline/training/`: reserved for training-specific pipeline code.
 
 ## Important behavior
 
