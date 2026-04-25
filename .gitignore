@@ -1,7 +1,9 @@
 project/.env
 project/data/
 project/denim-1/
-
+project/external/
+project/scripts/detection_pipeline/training/wandb/
+project/scripts/detection_pipeline/training/yolov5s.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
