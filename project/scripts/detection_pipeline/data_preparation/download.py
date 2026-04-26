@@ -15,7 +15,7 @@ from roboflow import Roboflow
 class DetectionDownloadConfig:
     workspace: str = "sthes-workspace"
     project_name: str = "denim-eihop"
-    version: int = 3
+    version: int = 5
     export_format: str = "coco"
     data_root: Path = config.DATA_DIR / "detection_dataset"
     api_key: str | None = None
