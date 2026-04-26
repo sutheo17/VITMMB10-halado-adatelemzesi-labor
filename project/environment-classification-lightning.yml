@@ -1,0 +1,32 @@
+name: dl-classification
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch>=2.2
+  - torchvision
+  - pytorch-cuda=12.1
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - scikit-learn
+  - pyyaml
+  - tqdm
+  - requests
+  - pillow
+  - seaborn
+  - git
+  - jupyterlab
+  - ipykernel
+  - pip:
+      - albumentations>=1.4
+      - lightning>=2.2
+      - wandb>=0.17
+      - torchmetrics>=1.4
+      - pycocotools>=2.0
+      - roboflow>=1.1
