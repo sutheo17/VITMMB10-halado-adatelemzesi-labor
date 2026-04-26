@@ -39,7 +39,9 @@ class ToothCropDataset(Dataset):
         if self.image_transform is not None:
             transformed = self.image_transform(image=image, bboxes=[crop_box], class_labels=[class_label])
             image = transformed["image"]
-            crop_box = transformed["bboxes"][0]
+            
+            if len(transformed["bboxes"]) > 0:
+                crop_box = transformed["bboxes"][0]
 
         crop = _safe_crop(image, crop_box)
         if self.resize_transform is not None:
