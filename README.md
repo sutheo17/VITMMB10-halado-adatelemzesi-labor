@@ -7,3 +7,5 @@
 [Adatvizualizáció terv](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQA1JmjofxS5RpYLSv7SVzyhAS2rzegieznDIjpDYxWwjac)
 
 [GT modellek terv](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQB289NypIG6SJIjBOa8tPcLAbPRUyxnxKjACXnH-vCfiXY?e=Z2yTu6)
+
+[GT értékelés terv](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQD_lDWk4p1jRYMUJWDFscgXATIf_r1kdgH-HBag33JEpnQ?e=yoNtqR)
