@@ -30,6 +30,7 @@ from detection_pipeline import (
     build_detection_records,
     build_detection_train_pipeline,
     load_or_download_detection_dataset,
+    split_grouped_records
 )
 
 
@@ -295,7 +296,13 @@ def main() -> None:
         force_download=force_download,
     )
     detection_records, tooth_label_map = build_detection_records(detection_coco, detection_image_dirs)
-    det_train, det_val, det_test = split_records_by_subset(detection_records)
+    det_train, det_val, det_test = split_grouped_records(
+        detection_records,
+        train_size=config.TRAIN_RATIO,
+        val_size=config.VAL_RATIO,
+        test_size=config.TEST_RATIO,
+        random_state=42
+    )
 
     detection_train = AugmentedToothDetectionDataset(
         ToothDetectionDataset(det_train, image_size=640, output_channels=3),
