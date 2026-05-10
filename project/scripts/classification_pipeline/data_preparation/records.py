@@ -147,10 +147,11 @@ def build_multiclass_classification_records_from_masks(
             if tooth_box is None:
                 continue
 
+            base_name = image_info["file_name"].split(".rf.")[0]
             records.append(
                 {
                     "record_id": f"{image_id}_{ann['id']}",
-                    "group_id": f"{subset}:{image_info['file_name']}",
+                    "group_id": base_name,
                     "subset": subset,
                     "source_image_id": image_id,
                     "image_path": str(image_path),
