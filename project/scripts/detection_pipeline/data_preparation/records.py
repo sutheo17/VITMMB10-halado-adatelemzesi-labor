@@ -68,10 +68,11 @@ def build_detection_records(coco_data: dict[str, Any], image_dirs: dict[str, Pat
                 labels.append(tooth_label_map[category_id])
 
         if boxes:
+            base_name = image_info["file_name"].split(".rf.")[0]
             records.append(
                 {
                     "image_id": image_id,
-                    "group_id": f"{subset}:{image_info['file_name']}",
+                    "group_id": base_name,
                     "subset": subset,
                     "image_path": str(image_path),
                     "file_name": image_info["file_name"],
