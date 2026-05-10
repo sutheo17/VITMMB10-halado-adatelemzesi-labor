@@ -8,3 +8,5 @@ from .data_preparation.records import (
 )
 from .data_preparation.datasets import ToothCropDataset
 from .data_preparation.pipelines import build_classification_image_pipeline, build_classification_resize_pipeline
+
+from .caries_model import ToothClassificationDataModule, LitToothClassifier
