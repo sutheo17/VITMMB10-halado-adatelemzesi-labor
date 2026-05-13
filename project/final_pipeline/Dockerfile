@@ -32,6 +32,9 @@ RUN mkdir -p /work/external && \
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
+# A modellek beépítése a konténerbe (ÚJ SOR!)
+COPY models/ /work/models/
+
 # FONTOS: A main.py bemásolása a konténerbe
 COPY main.py .
 
