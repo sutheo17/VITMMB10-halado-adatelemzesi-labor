@@ -58,7 +58,7 @@ These flags control what gets drawn on the final output images.
 
 ---
 
-## 💡 Example Usage
+## Example Usage
 
 Here is a practical example of how to run the pipeline if you **only want to draw red boxes on caries**, enable **WandB logging**, and assign the run to a custom project named `my-dental-project`. 
 
