@@ -221,3 +221,7 @@ project/scripts/output
 project/output
 project/scripts/wandb
 project/notebooks/wandb
+
+project/final_pipeline/input
+project/final_pipeline/log
+project/final_pipeline/output

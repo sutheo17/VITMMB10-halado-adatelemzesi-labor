@@ -1,0 +1,17 @@
+torch>=2.0.0
+torchvision>=0.15.0
+lightning>=2.0.0
+numpy>=1.22.0
+pandas>=1.5.0
+Pillow>=9.0.0
+wandb>=0.15.0
+tqdm>=4.65.0
+scikit-learn>=1.2.0
+# YOLOv5 specifikus függőségek:
+pyyaml>=5.3.1
+scipy>=1.4.1
+opencv-python-headless>=4.5.5
+matplotlib>=3.5.0
+seaborn>=0.12.0
+requests>=2.23.0
+psutil

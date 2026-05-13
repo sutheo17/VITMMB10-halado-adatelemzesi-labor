@@ -1,0 +1,34 @@
+{
+  "run_id": "ee980eccc7",
+  "config": {
+    "classification_dataset_root": "/work/data/classification_dataset",
+    "output_root": "/work/scripts/detection_pipeline/inference pipelines/dataprep/prepared_tooth_crops",
+    "splits": [
+      "train",
+      "valid",
+      "test"
+    ],
+    "coco_filename": "_annotations.coco.json",
+    "selected_image_category_names": [],
+    "selected_image_category_ids": [],
+    "category_name_match_mode": "startswith",
+    "image_size": 640,
+    "experiment_name": "label-loss-fixed2",
+    "pretrained_weights": "yolov5s.pt",
+    "num_classes": 32,
+    "heuristic_conf_threshold": 0.29,
+    "heuristic_iou_threshold": 0.45,
+    "heuristic_max_detections": 200,
+    "inter_class_nms_threshold": 0.75,
+    "use_pre_inference_zoom_crop": true,
+    "zoom_factor": 0.9,
+    "zoom_center_x_fraction": 0.5,
+    "zoom_center_y_fraction": 0.6666666666666666,
+    "yolo_crop_margin": 0.0,
+    "missed_gt_crop_margin": 0.08,
+    "missed_match_iou_threshold": 0.5,
+    "yolo_label_to_coco_category_id_offset": 1,
+    "overwrite_existing_run": false,
+    "jpeg_quality": 95
+  }
+}

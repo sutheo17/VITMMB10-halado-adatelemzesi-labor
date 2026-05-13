@@ -1,0 +1,81 @@
+category_id	category_name
+0	see
+1	3M ESPE Implant
+2	47
+3	48
+4	49
+5	50
+6	51
+7	52
+8	53
+9	54
+10	55
+11	56
+12	57
+13	58
+14	59
+15	60
+16	61
+17	62
+18	63
+19	64
+20	65
+21	66
+22	67
+23	68
+24	69
+25	70
+26	71
+27	72
+28	73
+29	74
+30	75
+31	76
+32	77
+33	78
+34	AGS Medikal Implant
+35	AMerOss Implant
+36	Amalgam filling
+37	Anthogyr Implant
+38	Bicon Implant
+39	BioHorizons Implant
+40	BioLife Implant
+41	Biomet 3i Implant
+42	Blue Sky Bio Implant
+43	Camlog Implant
+44	Caries
+45	Composite filling
+46	Cowellmedi Implant
+47	Crown
+48	DENTSPLY Implant
+49	Dentatus Implant
+50	Dentis Implant
+51	Dentium Implant
+52	Euroteknika Implant
+53	Filling
+54	Frontier Implant
+55	Hiossen Implant
+56	Implant
+57	Implant Direct
+58	Keystone Dental Implant
+59	Leone Implant
+60	MIS Implant
+61	Mandible
+62	Maxilla
+63	Megagen Implant
+64	Neodent Implant
+65	Neoss Implant
+66	Nobel Biocare Implant
+67	Novodent Implant
+68	NucleOSS Implant
+69	OCO Biomedical Implant
+70	OsseoLink Implant
+71	Osstem Implant
+72	Prefabricated metal post
+73	Retained root
+74	Root canal filling
+75	Root canal obturation
+76	Sterngold Implant
+77	Straumann Implant
+78	Titan Implant Implant
+79	Zimmer Implant
