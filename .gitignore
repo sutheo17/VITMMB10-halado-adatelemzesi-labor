@@ -225,3 +225,7 @@ project/notebooks/wandb
 project/final_pipeline/input
 project/final_pipeline/log
 project/final_pipeline/output
+
+project/scripts/evaluation/wandb
+project/scripts/evaluation/models/classification.ckpt
+project/final_models/classification.ckpt
