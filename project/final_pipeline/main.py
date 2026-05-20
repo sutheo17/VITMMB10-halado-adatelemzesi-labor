@@ -9,7 +9,7 @@ from pathlib import Path
 import torch
 import torchvision.transforms as T
 import torchvision.transforms.functional as TF
-from torchvision.models import resnet50, ResNet50_Weights
+from torchvision.models import efficientnet_b0, EfficientNet_B0_Weights
 import lightning as L
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
@@ -35,15 +35,6 @@ class LitYOLOv5(torch.nn.Module):
         self.model = Model(yolo_cfg, ch=3, nc=num_classes).float()
         self.model.hyp = {'box': 0.05, 'cls': 0.3, 'obj': 0.7, 'cls_pw': 1.0, 'obj_pw': 1.0, 'fl_gamma': 0.0, 'label_smoothing': 0.0, 'anchor_t': 4.0}
 
-class LitToothClassifier(L.LightningModule):
-    def __init__(self, num_classes=2, class_weights=None):
-        super().__init__()
-        self.model = resnet50(weights=ResNet50_Weights.DEFAULT)
-        for param in self.model.parameters():
-            param.requires_grad = False
-        self.model.fc = torch.nn.Linear(self.model.fc.in_features, num_classes)
-    def forward(self, x):
-        return self.model(x)
 
 def box_iou_xyxy(boxes1: torch.Tensor, boxes2: torch.Tensor) -> torch.Tensor:
     if len(boxes1) == 0 or len(boxes2) == 0:
@@ -155,12 +146,12 @@ def main(args):
     yolo_model.model.load_state_dict(torch.load(args.yolo_weights, map_location='cpu'), strict=False)
     yolo_model.to(device).eval()
 
-    logger.info("ResNet50 klasszifikációs modell betöltése...")
-    classifier_model = LitToothClassifier.load_from_checkpoint(args.clf_weights, num_classes=2, strict=False)
+    logger.info("EfficientNet-B0 klasszifikációs modell betöltése...")
+    classifier_model = torch.load(args.clf_weights, map_location=device, weights_only=False)
     classifier_model.to(device).eval()
 
-    # Kép transzformáció a ResNet-hez
-    resnet_transform = T.Compose([
+    # Kép transzformáció az EfficientNet-hez
+    efficientnet_transform = T.Compose([
         T.Resize((224, 224)),
         T.ToTensor(),
         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -169,11 +160,12 @@ def main(args):
     image_files = [f for f in os.listdir(args.input_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     logger.info(f"Talált képek száma: {len(image_files)}")
 
+    total_images = len(image_files) # Elmentjük a képek összegzett számát
     total_caries = 0
     total_healthy = 0
 
-    for img_name in image_files:
-        logger.info(f"Feldolgozás: {img_name}")
+    for idx, img_name in enumerate(image_files, start=1):
+        logger.info(f"[{idx} / {total_images}] Kép feldolgozása: {img_name}")
         img_path = os.path.join(args.input_dir, img_name)
         
         try:
@@ -208,8 +200,12 @@ def main(args):
         draw = ImageDraw.Draw(orig_img)
         results_json = []
 
+        total_detected_teeth = len(pred_boxes_original) # Előre lekérjük az összes fog számát a képen
+
         # 2. Klasszifikáció (ResNet)
         for i, box in enumerate(pred_boxes_original):
+            logger.info(f"  -> Klasszifikáció: {i+1} / {total_detected_teeth} fog feldolgozása...")
+            
             x1, y1, x2, y2 = [int(v) for v in box.tolist()]
             
             # Védelem a kilógó koordináták ellen
@@ -220,7 +216,7 @@ def main(args):
                 continue
 
             tooth_crop = orig_img.crop((x1, y1, x2, y2))
-            clf_input = resnet_transform(tooth_crop).unsqueeze(0).to(device)
+            clf_input = efficientnet_transform(tooth_crop).unsqueeze(0).to(device)
 
             with torch.no_grad():
                 logits = classifier_model(clf_input)
@@ -281,7 +277,7 @@ if __name__ == "__main__":
     parser.add_argument('--output_dir', type=str, default='/work/output', help='Eredmények mappája')
     parser.add_argument('--log_dir', type=str, default='/work/log', help='Logok mappája')
     parser.add_argument('--yolo_weights', type=str, default='/work/models/detection.pt', help='YOLO súlyok')
-    parser.add_argument('--clf_weights', type=str, default='/work/models/classification.ckpt', help='ResNet súlyok')
+    parser.add_argument('--clf_weights', type=str, default='/work/models/classification.pt', help='ResNet súlyok')
     
     # Kép rajzolási beállítások
     parser.add_argument('--draw_healthy', action='store_true', help='Rajzolja be az egészséges fogakat (zöld)')
