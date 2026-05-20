@@ -92,10 +92,17 @@ def compute_zoom_crop_box(width: int, height: int, zoom_factor=0.90, zoom_center
     x2, y2 = min(width, x1 + crop_w), min(height, y1 + crop_h)
     return int(x1), int(y1), int(x2), int(y2)
 
-def prepare_image_for_yolo(orig_img: Image.Image, img_size=640):
+def prepare_image_for_yolo(orig_img: Image.Image, img_size=640, use_zoom=True):
     orig_w, orig_h = orig_img.size
-    zx1, zy1, zx2, zy2 = compute_zoom_crop_box(orig_w, orig_h)
-    inference_img = orig_img.crop((zx1, zy1, zx2, zy2))
+    
+    if use_zoom:
+        zx1, zy1, zx2, zy2 = compute_zoom_crop_box(orig_w, orig_h)
+        inference_img = orig_img.crop((zx1, zy1, zx2, zy2))
+    else:
+        # Ha nincs zoom, a teljes képet használjuk, a zoom_box pedig a teljes kép koordinátája (0-tól a szélekig)
+        zx1, zy1, zx2, zy2 = 0, 0, orig_w, orig_h
+        inference_img = orig_img
+
     inf_w, inf_h = inference_img.size
     scale = img_size / max(inf_w, inf_h)
     new_w, new_h = int(inf_w * scale), int(inf_h * scale)
@@ -175,7 +182,7 @@ def main(args):
             continue
 
         # 1. Detekció (YOLO)
-        img_tensor, prep_meta = prepare_image_for_yolo(orig_img)
+        img_tensor, prep_meta = prepare_image_for_yolo(orig_img, use_zoom=args.use_zoom)
         img_tensor = img_tensor.unsqueeze(0).to(device)
 
         with torch.no_grad():
@@ -184,7 +191,7 @@ def main(args):
             nms_preds = non_max_suppression(yolo_out, conf_thres=0.29, iou_thres=0.45, max_det=200)[0]
         
         if nms_preds is None or len(nms_preds) == 0:
-            logger.info(f"{img_name}: Nem találtam fogat.")
+            logger.info(f"{img_name}: Nincsen detektált fog.")
             continue
 
         # Two-stage heurisztika alkalmazása (Ahogy a notebookban is van)
@@ -194,7 +201,8 @@ def main(args):
         
         filtered_boxes, _, _ = apply_two_stage_heuristic(boxes, scores, labels, conflict_iou_threshold=0.75)
         
-        # Visszaszámolás az eredeti képre, de már csak a szűrt dobozokkal!
+        # Visszaszámolás az eredeti képre (A 'yolo_boxes_to_original_xyxy' automatikusan jól fog működni, 
+        # mert a prep_meta-ban a zx1, zy1 értékek 0-k lesznek, ha nincs zoom!)
         pred_boxes_original = yolo_boxes_to_original_xyxy(filtered_boxes, prep_meta)
         
         draw = ImageDraw.Draw(orig_img)
@@ -282,6 +290,8 @@ if __name__ == "__main__":
     # Kép rajzolási beállítások
     parser.add_argument('--draw_healthy', action='store_true', help='Rajzolja be az egészséges fogakat (zöld)')
     parser.add_argument('--draw_caries', action='store_true', help='Rajzolja be a szuvas fogakat (piros)')
+    
+    parser.add_argument('--use_zoom', action='store_true', help='Alkalmazza a zoom heurisztikát a képeken az inferálás előtt')
     
     # WandB beállítások
     parser.add_argument('--use_wandb', action='store_true', help='WandB logolás bekapcsolása')

@@ -44,6 +44,10 @@ You can customize the pipeline's behavior using the following command-line flags
 * **`--clf_weights`**: The exact path to the weights file for the ResNet classification model (caries detection).
     *(Default: `/work/models/classification.ckpt`)*
 
+### Visualization Settings (Image Input)
+These flags control what preprocesses run on the input images.
+* **`--use_zoom`**: If enabled, the program will apply the zoom-and-crop heuristic to the input images before running object detection.
+
 ### Visualization Settings (Image Output)
 These flags control what gets drawn on the final output images.
 * **`--draw_healthy`**: If enabled, the program will draw a **green box** around teeth classified as healthy.
