@@ -12,4 +12,6 @@
 
 [Alkalmazás terv](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQAXwQ_JauGAQLhpHvkumbb2AWeJ2ZSPAbRWjFRZSeJIIVo?e=b5Mvfh)
 
-[Alkalmazás terv](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQD7rriiOe0zR5HAEy00X0FWASrjbSXz94k7kVLkWfoxieY?e=rffdth)
+---
+
+[Dokumentáció](https://bmeedu-my.sharepoint.com/:w:/g/personal/sutheoistvan_edu_bme_hu/IQD7rriiOe0zR5HAEy00X0FWASrjbSXz94k7kVLkWfoxieY?e=rffdth)
